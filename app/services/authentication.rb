@@ -11,7 +11,7 @@ class Authentication
 
   def self.login_by_oauth_token oauth, request_params
     request_token = OAuth::RequestToken.new(TWITTER, oauth.token, oauth.secret)
-    jwt_for UserFromToken.new.get(request_token)
+    jwt_for UserFromToken.new.get(request_token, request_params[:oauth_verifier])
   end
 
   def self.jwt_for user
@@ -20,9 +20,9 @@ class Authentication
   end
   
   class UserFromToken
-    def get request_token
+    def get request_token, oauth_verifier 
 
-      access_token = request_token.get_access_token(oauth_verifier: request_params[:oauth_verifier])
+      access_token = request_token.get_access_token(oauth_verifier: oauth_verifier)
       user = User.find_or_create_by(uid: access_token.params[:user_id]) do |u| 
         u.handle = access_token.params[:screen_name] 
         #sets random password to avoid validation errors since email and password
