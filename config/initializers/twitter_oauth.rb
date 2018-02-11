@@ -4,3 +4,6 @@ TWITTER = OAuth::Consumer.new(
   authorize_path: '/oauth/authenticate',
   site: 'https://api.twitter.com'
 )
+
+OAUTH_CALLBACK = ENV['OAUTH_CALLBACK']
+
