@@ -32,7 +32,5 @@ module Blabber
     # config.i18n.default_locale = :de
 
  # Set environment secrets
-  ENV['ORIGIN'] = 'http://localhost:8080'
-  ENV['OAUTH_CALLBACK'] = 'http://127.0.0.1:3000/access_token'
   end
 end

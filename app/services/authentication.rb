@@ -1,35 +1,57 @@
 class Authentication
+  class << self
 
-  def self.login_by_password email, pwd
-    user = User.find_by email: email
-    if user && user.authenticate(pwd) != false
-      jwt_for user
-    else  #If authentication fails then...
-      nil
+    def login_by_provider provider
+      oauth_handler_for(provider).login
     end
-  end
 
-  def self.login_by_oauth_token oauth, request_params
-    request_token = OAuth::RequestToken.new(TWITTER, oauth.token, oauth.secret)
-    jwt_for UserFromToken.new.get(request_token, request_params[:oauth_verifier])
-  end
+    def produce_user_auth_token req_token, oauth_verifier, provider
+      acc_token = convert_to_access_token req_token, oauth_verifier, provider
+      token_uid = acc_token.params[:user_id]
+      UserOauthToken.find_by(uid: token_uid) || register_by_oauth(acc_token)
+    end
 
-  def self.jwt_for user
-    id = user.uid || user.id
-    JWT.encode({uid: user.uid, handle: user.handle, exp: 1.day.from_now.to_i}, Rails.application.secrets.secret_key_base)
-  end
-  
-  class UserFromToken
-    def get request_token, oauth_verifier 
+    def convert_to_access_token oauth, oauth_verifier, provider
+      client = oauth_handler_for(provider).client
+      token = OAuth::RequestToken.new(client, oauth.token, oauth.secret)
+      token.get_access_token(oauth_verifier: oauth_verifier)
+    end
 
-      access_token = request_token.get_access_token(oauth_verifier: oauth_verifier)
-      user = User.find_or_create_by(uid: access_token.params[:user_id]) do |u| 
-        u.handle = access_token.params[:screen_name] 
-        #sets random password to avoid validation errors since email and password
-        #auth is also supported
-        u.password = u.password_confirmation = SecureRandom.urlsafe_base64(n=6) 
+    def jwt_by_oauth token
+      jwt_for token.user_id, token.handle
+    end
+
+    def jwt_for uid, login
+      JWT.encode(
+        { uid: uid, login: login, exp: 1.day.from_now.to_i },
+        Rails.application.secrets.secret_key_base
+      )
+    end
+
+    def register_by_oauth access_token
+      token = UserOauthToken.new
+      token.tap do |oauth|
+        oauth.build_user
+        oauth.uid    = access_token.params[:user_id]
+        oauth.handle =  access_token.params[:screen_name]
+        oauth.token  = access_token.params[:oauth_token]
+        oauth.secret =  access_token.params[:oauth_token_secret]
+        oauth.save
       end
     end
+
+    def oauth_handler_for provider
+      case provider
+      when "twitter"
+        OauthProviders::Twitter
+      end
+    end
+
+    def login_by_password email, pwd
+      #TBD
+    end
+
   end
+
 
 end
