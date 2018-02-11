@@ -43,7 +43,7 @@ class Authentication
     def oauth_handler_for provider
       case provider
       when "twitter"
-        TwitterWrapper
+        OauthProviders::Twitter
       end
     end
 
@@ -53,23 +53,5 @@ class Authentication
 
   end
 
-  class TwitterWrapper
-    class << self
-      def client
-        TWITTER
-      end
-
-      def login
-        request_token = TWITTER.get_request_token(oauth_callback: TWITTER_OAUTH_CALLBACK)
-        store_token request_token, "twitter"
-        request_token.authorize_url(oauth_callback: TWITTER_OAUTH_CALLBACK)
-      end
-
-
-      def store_token request_token, provider
-        Oauth.find_or_create_by(token: request_token.token, secret: request_token.secret, provider: provider)
-      end
-    end
-  end
 
 end
