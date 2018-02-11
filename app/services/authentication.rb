@@ -11,7 +11,7 @@ class Authentication
       Oauth.find_or_create_by(token: request_token.token, secret: request_token.secret)
     end
 
-    def register_by_auth_token access_token
+    def register_by_oauth access_token
       token = UserOauthToken.new
       token.tap do |oauth|
         oauth.build_user
@@ -23,46 +23,30 @@ class Authentication
       end
     end
 
-    def convert_to_access_token oauth, request_params
-      request_token = OAuth::RequestToken.new(TWITTER, oauth.token, oauth.secret)
-      request_token.get_access_token(oauth_verifier: request_params[:oauth_verifier])
+    def convert_to_access_token oauth, oauth_verifier
+      token = OAuth::RequestToken.new(TWITTER, oauth.token, oauth.secret)
+      token.get_access_token(oauth_verifier: oauth_verifier)
+    end
+
+    def produce_user_auth_token req_token, oauth_verifier
+      acc_token = convert_to_access_token req_token, oauth_verifier
+      token_uid = acc_token.params[:user_id]
+      UserOauthToken.find_by(uid: token_uid) || register_by_oauth(acc_token)
     end
 
     def jwt_by_oauth token
       jwt_for token.user_id, token.handle
     end
 
-    def jwt_for user_id, user_login
-      JWT.encode({uid: user_id, login: user_login, exp: 1.day.from_now.to_i}, Rails.application.secrets.secret_key_base)
+    def jwt_for uid, login
+      JWT.encode(
+        { uid: uid, login: login, exp: 1.day.from_now.to_i },
+        Rails.application.secrets.secret_key_base
+      )
     end
 
     def login_by_password email, pwd
-      user = User.find_by email: email
-      if user && user.authenticate(pwd) != false
-        jwt_for user
-      else  #If authentication fails then...
-        nil
-      end
-    end
-
-  end
-
-  class UserFromToken
-
-    def get request_token, oauth_verifier 
-
-      access_token = request_token.get_access_token(oauth_verifier: oauth_verifier)
-
-      user = User.new
-      user.tap do |u|
-        u.user_oauth_tokens.build(
-          uid: access_token.params[:user_id],
-          handle:  access_token.params[:screen_name],
-          token: access_token.params[:oauth_token],
-          secret: access_token.params[:oauth_token_secret],
-        )
-        u.save
-      end
+      #TBD
     end
 
   end
