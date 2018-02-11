@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180211025654) do
+ActiveRecord::Schema.define(version: 20180211172855) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20180211025654) do
   create_table "oauths", id: :serial, force: :cascade do |t|
     t.string "token", null: false
     t.string "secret", null: false
+    t.string "provider"
     t.index ["token"], name: "index_oauths_on_token"
   end
 
