@@ -2,8 +2,8 @@ Rails.application.routes.draw do
   match '*all', to: 'application#preflight', via: [:options]
 
   get 'current_user',  to: 'application#current_user'
-  get 'request_token', to: 'authentication#request_token'
-  get 'access_token',  to: 'authentication#access_token'
+  get ':provider/request_token', to: 'authentication#request_token'
+  get ':provider/access_token',  to: 'authentication#access_token'
 
   post 'login', to: 'authentication#login'
 

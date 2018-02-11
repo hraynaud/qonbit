@@ -2,12 +2,12 @@ class Authentication
   class << self
 
     def twitter_login
-      request_token = TWITTER.get_request_token(oauth_callback: OAUTH_CALLBACK)
-      store request_token, "twitter"
-      request_token
+      request_token = TWITTER.get_request_token(oauth_callback: TWITTER_OAUTH_CALLBACK)
+      store_token request_token
+      request_token.authorize_url(oauth_callback: TWITTER_OAUTH_CALLBACK)
     end
 
-    def store request_token, provider
+    def store_token request_token
       Oauth.find_or_create_by(token: request_token.token, secret: request_token.secret)
     end
 

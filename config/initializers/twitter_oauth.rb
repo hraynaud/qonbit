@@ -5,5 +5,5 @@ TWITTER = OAuth::Consumer.new(
   site: 'https://api.twitter.com'
 )
 
-OAUTH_CALLBACK = ENV['OAUTH_CALLBACK']
+TWITTER_OAUTH_CALLBACK = ENV['TWITTER_OAUTH_CALLBACK']
 

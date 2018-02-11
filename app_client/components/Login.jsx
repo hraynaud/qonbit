@@ -39,7 +39,7 @@ export default React.createClass({
         </form>
 
         <p>
-        <a href={this.props.origin + '/request_token'}>Twitter Login</a>
+          <a href={this.props.origin + '/twitter/request_token'}>Twitter Login</a>
         </p>
       </div>
 

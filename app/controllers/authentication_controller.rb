@@ -1,8 +1,7 @@
 class AuthenticationController < ApplicationController
 
   def request_token
-    request_token = Authentication.twitter_login
-    redirect_to request_token.authorize_url(oauth_callback: OAUTH_CALLBACK)
+    redirect_to oauth_login_by_provider params[:provider]
   end
 
   def access_token
@@ -17,6 +16,14 @@ class AuthenticationController < ApplicationController
   end
 
   private
+
+  def oauth_login_by_provider provider
+    case provider
+    when "twitter"
+      Authentication.twitter_login
+    end
+
+  end
 
   def origin
     ENV['ORIGIN']
