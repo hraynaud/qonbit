@@ -3,22 +3,37 @@ class Authentication
 
     def twitter_login
       request_token = TWITTER.get_request_token(oauth_callback: OAUTH_CALLBACK)
-      store request_token
+      store request_token, "twitter"
       request_token
     end
 
-    def store request_token
-      Oauth.create(token: request_token.token, secret: request_token.secret)
+    def store request_token, provider
+      Oauth.find_or_create_by(token: request_token.token, secret: request_token.secret)
     end
 
-    def login_by_oauth_token oauth, request_params
+    def register_by_auth_token access_token
+      token = UserOauthToken.new
+      token.tap do |oauth|
+        oauth.build_user
+        oauth.uid    = access_token.params[:user_id]
+        oauth.handle =  access_token.params[:screen_name]
+        oauth.token  = access_token.params[:oauth_token]
+        oauth.secret =  access_token.params[:oauth_token_secret]
+        oauth.save
+      end
+    end
+
+    def convert_to_access_token oauth, request_params
       request_token = OAuth::RequestToken.new(TWITTER, oauth.token, oauth.secret)
-      jwt_for UserFromToken.new.get(request_token, request_params[:oauth_verifier])
+      request_token.get_access_token(oauth_verifier: request_params[:oauth_verifier])
     end
 
-    def jwt_for user
-      id = user.uid || user.id
-      JWT.encode({uid: id, handle: user.handle, exp: 1.day.from_now.to_i}, Rails.application.secrets.secret_key_base)
+    def jwt_by_oauth token
+      jwt_for token.user_id, token.handle
+    end
+
+    def jwt_for user_id, user_login
+      JWT.encode({uid: user_id, login: user_login, exp: 1.day.from_now.to_i}, Rails.application.secrets.secret_key_base)
     end
 
     def login_by_password email, pwd
@@ -33,16 +48,23 @@ class Authentication
   end
 
   class UserFromToken
+
     def get request_token, oauth_verifier 
 
       access_token = request_token.get_access_token(oauth_verifier: oauth_verifier)
-      User.find_or_create_by(uid: access_token.params[:user_id]) do |u| 
-        u.handle = access_token.params[:screen_name] 
-        #sets random password to avoid validation errors since email and password
-        #auth is also supported
-        u.password = u.password_confirmation = SecureRandom.urlsafe_base64
+
+      user = User.new
+      user.tap do |u|
+        u.user_oauth_tokens.build(
+          uid: access_token.params[:user_id],
+          handle:  access_token.params[:screen_name],
+          token: access_token.params[:oauth_token],
+          secret: access_token.params[:oauth_token_secret],
+        )
+        u.save
       end
     end
+
   end
 
 end

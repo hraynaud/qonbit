@@ -1,20 +1,12 @@
 class User < ApplicationRecord
   has_many :blabs
   has_many :projects
-  has_secure_password
+  has_many :user_oauth_tokens
 
-  validates :uid, :handle, presence: true, on: :create, unless: :using_pwd?
-  validates :email, uniqueness: true, allow_nil: true
-  validates :email, presence: true, unless: :is_oauth?
-  validates :password, :length => { :minimum => 5 }, allow_nil: true,  on: :create, unless: :is_oauth?
+  def handle
+    user_oauth_tokens.try(:first).handle
+  end
 
   private
 
-  def is_oauth?
-    handle.present? && uid.present?
-  end
-
-  def using_pwd?
-    password.present? && email.present?
-  end
 end
