@@ -6,12 +6,16 @@ class AuthenticationController < ApplicationController
   end
 
   def access_token
-    oauth = Oauth.find_by(token: params[:oauth_token])
-    if oauth.present?
-      jwt = Authentication.login_by_oauth_token oauth, params
-      redirect_to "#{origin}?jwt=#{jwt}"
-    else
-      #TBD
+    req_token = Oauth.find_by(token: params[:oauth_token])
+
+    if req_token
+      acc_token = Authentication.convert_to_access_token req_token, params
+      user_oauth_token = UserOauthToken.find_by(uid: acc_token.params[:user_id]) ||
+        Authentication.register_by_auth_token(acc_token)
+
+      redirect_to "#{origin}?jwt=#{Authentication.jwt_by_oauth(user_oauth_token)}"
+    else 
+      #TBD ????
     end
   end
 
