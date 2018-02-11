@@ -9,6 +9,7 @@ class AuthenticationController < ApplicationController
 
     if request_token
       user_oauth_token = Authentication.produce_user_auth_token(request_token, params[:oauth_verifier], params[:provider])
+      request_token.delete
       redirect_to "#{origin}?jwt=#{Authentication.jwt_by_oauth(user_oauth_token)}"
     else
       #TBD ????
