@@ -1,3 +1,4 @@
+var webpack = require('webpack');
 module.exports = {
   entry: ['./app_client/index.js'],
   output: {
@@ -25,5 +26,11 @@ module.exports = {
   devServer: {
     historyApiFallback: true
   },
-  plugins: []
+
+  plugins: [
+    new webpack.DefinePlugin({
+      REGISTRATION_PATH: JSON.stringify("/register_with_email_pwd"),
+      LOGIN_PATH: JSON.stringify("/login_with_email_pwd")
+    })
+  ]
 };
