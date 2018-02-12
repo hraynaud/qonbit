@@ -36,8 +36,8 @@ var App =  React.createClass({
       contentType: 'application/json',
       headers: {'Authorization': sessionStorage.getItem('jwt')},
       success: successFunction,
-      error: function(error) {
-        console.error(url, error['response']);
+      error: function(xhr) {
+        console.log(url, error['response']);
       }
     });
   },
@@ -53,7 +53,7 @@ var App =  React.createClass({
       headers: {'Authorization': sessionStorage.getItem('jwt')},
       success: successFunction,
       error: function(error) {
-        console.error(url, error['response']);
+        console.error(error.getResponseHeader("X-Message"));
       }
     });
   },
