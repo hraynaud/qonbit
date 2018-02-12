@@ -11,6 +11,6 @@
      origins { |source, env| Rails.env.development? && source == "http://localhost:8080"}
      resource '*',
        headers: :any,
-       methods: [:get, :post, :put, :patch, :delete, :options, :head]
+       methods: [:get, :post, :put, :patch, :delete, :options, :head], expose: ["X-Message"]
    end
  end
