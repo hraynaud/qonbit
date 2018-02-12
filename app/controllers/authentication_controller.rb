@@ -19,7 +19,8 @@ class AuthenticationController < ApplicationController
   def login_with_email_pwd
     user_pwd_auth = UserLoginPwdAuth.find_by_email(params[:email])
     if user_pwd_auth && user_pwd_auth.user  && user_pwd_auth.authenticate(params[:password])
-     redirect_to "#{base_client_path}#{Authentication.login_by_password(user_pwd_auth)}"
+
+      render json: {jwt: Authentication.jwt_for(user_pwd_auth.id, user_pwd_auth.email)}, status: 200
     end
   end
 
@@ -27,7 +28,7 @@ class AuthenticationController < ApplicationController
      user = User.new
      user.build_user_login_pwd_auth(email: params[:email], password:params[:password]) 
      if user.save
-       redirect_to "#{base_client_path}#{Authentication.login_by_password(user.user_login_pwd_auth)}"
+       render json: {jwt: Authentication.jwt_for(user.user_login_pwd_auth.id, user.user_login_pwd_auth.email)}, status: 200
      else
        response.headers["X-Message"]= "Unable to register user: #{user.errors.full_messages}"
        head :unprocessable_entity
