@@ -5,7 +5,8 @@ Rails.application.routes.draw do
   get ':provider/request_token', to: 'authentication#request_token'
   get ':provider/access_token',  to: 'authentication#access_token'
 
-  post 'login', to: 'authentication#login'
+  post 'login_with_email_pwd', to: 'authentication#login_with_email_pwd'
+  post 'register_with_email_pwd', to: 'authentication#register_with_email_pwd'
 
   resources :blabs, only: [:index, :create, :show]
   resources :projects, only: [:index, :create, :show]

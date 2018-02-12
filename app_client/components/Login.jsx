@@ -5,14 +5,21 @@ export default React.createClass({
   getInitialState: function() {
     return { errors: [] };
   },
- 
-  handleSubmit: function(e) {
-    e.preventDefault();
-    var email = this.refs.email.getDOMNode().value;
-    var password = this.refs.password.getDOMNode().value;
-    var credentials = JSON.stringify({email:email, password:password});
 
-    this.props.writeToAPI('post', this.props.origin + '/login', credentials, function(response) {
+  handleLogin: function(){
+    this.submit(LOGIN_PATH)
+  },
+
+  handleRegister: function(){
+    this.submit(REGISTRATION_PATH)
+  },
+
+  submit: function(path) {
+    let email = this.email.value;
+    let password = this.password.value;
+    let credentials = JSON.stringify({email:email, password:password});
+
+    this.props.writeToAPI('post', path, credentials, function(response) {
       if (!!response.jwt) {
         this.props.setToken(response.jwt)
         location = '/';
@@ -26,17 +33,18 @@ export default React.createClass({
        <p>
          Login to your account with your email and password or through Twitter
        </p>
-        <form onSubmit={this.handleSubmit}>
+        <section onSubmit={this.handleSubmit}>
         <div className="card--login__field">
         <label name="email">Email</label>
-        <input type="text" name="email" ref="email" /> 
+        <input ref={text => this.email = text} type="text" name="email" /> 
         </div>
         <div className="card--login__field">
         <label name="password">Password</label>
-        <input type="password" name="password" ref="password" />
+        <input ref={pwd => this.password = pwd} type="password" name="password" />
         </div>
-        <button type="submit" className="card--login__submit">Login</button>
-        </form>
+        <button ref={btn => this.login_btn = btn}  onClick={this.handleLogin}>Login</button>
+        <button ref={btn => this.register_btn = btn} onClick={this.handleRegister}>Register</button>
+        </section>
 
         <p>
           <a href={this.props.origin + '/twitter/request_token'}>Twitter Login</a>

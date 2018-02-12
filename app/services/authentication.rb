@@ -40,15 +40,15 @@ class Authentication
       end
     end
 
+    def login_by_password auth
+      jwt_for auth.id, auth.email
+    end
+
     def oauth_handler_for provider
       case provider
       when "twitter"
         OauthProviders::Twitter
       end
-    end
-
-    def login_by_password email, pwd
-      #TBD
     end
 
   end
