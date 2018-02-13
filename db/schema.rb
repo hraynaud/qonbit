@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180211195914) do
+ActiveRecord::Schema.define(version: 20180211025654) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,7 +26,6 @@ ActiveRecord::Schema.define(version: 20180211195914) do
   create_table "oauths", id: :serial, force: :cascade do |t|
     t.string "token", null: false
     t.string "secret", null: false
-    t.string "provider"
     t.index ["token"], name: "index_oauths_on_token"
   end
 
@@ -39,15 +38,6 @@ ActiveRecord::Schema.define(version: 20180211195914) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_projects_on_user_id"
-  end
-
-  create_table "user_login_pwd_auths", force: :cascade do |t|
-    t.bigint "user_id"
-    t.string "email"
-    t.string "password_digest"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_user_login_pwd_auths_on_user_id"
   end
 
   create_table "user_oauth_tokens", force: :cascade do |t|
@@ -69,5 +59,4 @@ ActiveRecord::Schema.define(version: 20180211195914) do
   end
 
   add_foreign_key "projects", "users"
-  add_foreign_key "user_login_pwd_auths", "users"
 end
