@@ -3,7 +3,7 @@ class ProjectsController < ApplicationController
   before_action :authenticate_request, only: [:create]
 
   def index
-    @projects = Blab.all.order(created_at: :desc)
+    @projects = Project.all.order(created_at: :desc)
     render json: @projects, include: { user: { only: [:handle] } }, only: [:id, :content]
   end
 
