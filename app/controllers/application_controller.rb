@@ -11,12 +11,8 @@ class ApplicationController < ActionController::API
   private
 
   def authenticate_request
-    begin
-      id = JWT.decode(request.headers['Authorization'], Rails.application.secrets.secret_key_base)[0]['uid']
-      @current_user = User.find(id)
-    rescue JWT::DecodeError
-      render json: 'authentication failed', status: 401
-    end
+    @current_user = Authentication.login_with_jwt request.headers['Authorization']
+    render json: 'authentication failed', status: 401 if @current_user.nil?
   end
 
   def base_client_path

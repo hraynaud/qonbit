@@ -59,7 +59,15 @@ class Authentication
       end
     end
 
-  end
+    def login_with_jwt secret
+      begin
+        id = JWT.decode(secret, Rails.application.secrets.secret_key_base)[0]['uid']
+        User.where(id: id).first
+      rescue JWT::DecodeError
+        nil
+      end
 
+    end
+  end
 
 end
