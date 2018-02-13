@@ -27,14 +27,10 @@ class AuthenticationController < ApplicationController
     user = Authentication.register_directly(params[:email], params[:password])
 
     if user.valid?
-      jwt = Authentication.jwt_for(user.id, user.auth_email)
-      render json: {jwt: jwt}, status: 200
+      render json: {jwt: Authentication.jwt_for(user.id, user.auth_email)}, status: 200
     else
-      response.headers["X-Message"]= "Unable to register user: #{user_auth.errors.full_messages}"
-      head :unprocessable_entity
+      respond_with_error "Unable to register user: #{user_auth.errors.full_messages}"
     end
   end
-
-  private
 
 end

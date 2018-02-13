@@ -23,4 +23,13 @@ class ApplicationController < ActionController::API
     ENV['ORIGIN']
   end
 
+  def respond_with_error msg
+    set_response_msg msg
+    head :unprocessable_entity
+  end
+
+  def set_response_msg msg
+    response.headers["X-Message"]= msg
+  end
+
 end
