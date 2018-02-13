@@ -8,7 +8,6 @@ class ProjectsController < ApplicationController
   end
 
   def create
-    binding.pry
     @project = @current_user.projects.build(project_params)
     if @project.save
       render json: @project, include: { user: { only: [:handle] } }, only: [:id, :content], status: :created, location: project_url(@project, format: :json)
