@@ -17,22 +17,22 @@ class AuthenticationController < ApplicationController
   end
 
   def login_with_email_pwd
-    user_pwd_auth = UserLoginPwdAuth.find_by_email(params[:email])
-    if user_pwd_auth && user_pwd_auth.user  && user_pwd_auth.authenticate(params[:password])
-
-      render json: {jwt: Authentication.jwt_for(user_pwd_auth.id, user_pwd_auth.email)}, status: 200
+    auth = DirectAuth.find_by_email(params[:email])
+    if auth && auth.user  && auth.authenticate(params[:password])
+      render json: {jwt: Authentication.jwt_for(auth.user_id, auth.email)}, status: 200
     end
   end
 
   def register_with_email_pwd
-     user = User.new
-     user.build_user_login_pwd_auth(email: params[:email], password:params[:password]) 
-     if user.save
-       render json: {jwt: Authentication.jwt_for(user.user_login_pwd_auth.id, user.user_login_pwd_auth.email)}, status: 200
-     else
-       response.headers["X-Message"]= "Unable to register user: #{user.errors.full_messages}"
-       head :unprocessable_entity
-     end
+    user = Authentication.register_directly(params[:email], params[:password])
+
+    if user.valid?
+      jwt = Authentication.jwt_for(user.id, user.auth_email)
+      render json: {jwt: jwt}, status: 200
+    else
+      response.headers["X-Message"]= "Unable to register user: #{user_auth.errors.full_messages}"
+      head :unprocessable_entity
+    end
   end
 
   private
