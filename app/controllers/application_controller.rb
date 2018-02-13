@@ -1,16 +1,14 @@
 class ApplicationController < ActionController::API
 
- def preflight
-   head :ok
- end
+  def preflight
+    head :ok
+  end
 
+  def index
+    render file: 'public/index.html'
+  end
 
- def index
-   render file: 'public/index.html'
- end
-
-
-private
+  private
 
   def authenticate_request
     begin
@@ -21,9 +19,9 @@ private
     end
   end
 
-   def base_client_path
-     "#{origin}?jwt="
-   end
+  def base_client_path
+    "#{origin}?jwt="
+  end
 
   def origin
     ENV['ORIGIN']
