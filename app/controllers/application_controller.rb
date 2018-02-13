@@ -36,4 +36,13 @@ end
       render json: 'authentication failed', status: 401
     end
   end
+
+   def base_client_path
+     "#{origin}?jwt="
+   end
+
+  def origin
+    ENV['ORIGIN']
+  end
+
 end
