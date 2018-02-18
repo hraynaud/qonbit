@@ -1,9 +1,9 @@
 class User < ApplicationRecord
-  has_many :blabs
-  has_many :projects
-  has_many :user_oauth_tokens
-  has_one  :direct_auth
-  validates_associated :direct_auth
+  has_many :projects, dependent: :destroy
+  has_many :user_oauth_tokens, dependent: :destroy
+  has_one  :direct_auth, dependent: :destroy
+
+  validates_associated :direct_auth, allow_mil: true
 
   def handle
     user_oauth_tokens.try(:first).handle
