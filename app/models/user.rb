@@ -5,6 +5,10 @@ class User < ApplicationRecord
 
   validates_associated :direct_auth, allow_mil: true
 
+  after_create :add_to_social_graph
+
+  delegate :add_friend, :friends, :befriend, :friends_with?, :follows?, :follow, :unfollow, :followers, :following, :block, :blocks?, to: :as_node
+
   def handle
     user_oauth_tokens.try(:first).handle
   end
@@ -13,6 +17,23 @@ class User < ApplicationRecord
     direct_auth.email
   end
 
+  def name
+    "#{first_name} #{last_name}"
+  end
+
+  def as_node
+    @node ||= SocialGraph.get_user_node self
+  end
+
   private
 
+  def add_to_social_graph
+    node = SocialGraph.add_user self
+    self.node_id = node.id
+    save
+  end
+
+  def remove_from_social_graph
+    as_node.destroy
+  end
 end
