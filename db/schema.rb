@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180218182502) do
+ActiveRecord::Schema.define(version: 20180224202329) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,6 +32,12 @@ ActiveRecord::Schema.define(version: 20180218182502) do
     t.index ["user_id"], name: "index_direct_auths_on_user_id"
   end
 
+  create_table "domains", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "oauths", id: :serial, force: :cascade do |t|
     t.string "token", null: false
     t.string "secret", null: false
@@ -48,6 +54,16 @@ ActiveRecord::Schema.define(version: 20180218182502) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_projects_on_user_id"
+  end
+
+  create_table "resources", force: :cascade do |t|
+    t.bigint "domain_id"
+    t.bigint "user_id"
+    t.integer "specialist_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["domain_id"], name: "index_resources_on_domain_id"
+    t.index ["user_id"], name: "index_resources_on_user_id"
   end
 
   create_table "user_oauth_tokens", force: :cascade do |t|
@@ -71,4 +87,6 @@ ActiveRecord::Schema.define(version: 20180218182502) do
 
   add_foreign_key "direct_auths", "users"
   add_foreign_key "projects", "users"
+  add_foreign_key "resources", "domains"
+  add_foreign_key "resources", "users"
 end
