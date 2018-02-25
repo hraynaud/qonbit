@@ -2,15 +2,11 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
 
-  let(:user){FactoryBot.create(:user)}
-  let(:friend){FactoryBot.create(:user)}
+  it {is_expected.to be_valid}
 
-  it "should be valid" do
-    expect(user).to be_valid
+  it "adds user to social graph when created" do
+    user = User.new
+    expect(user).to receive(:add_to_social_graph)
+    user.save
   end
-
-  it "should have an associated related node" do
-    expect(user.as_node).to_not be_nil
-  end
-
 end

@@ -28,12 +28,10 @@ class User < ApplicationRecord
   private
 
   def add_to_social_graph
-    node = SocialGraph.add_user self
-    self.node_id = node.id
-    save
+    SocialGraph.add_node_for_user self
   end
 
   def remove_from_social_graph
-    as_node.destroy
+    SocialGraph.remove_node_for_user self
   end
 end

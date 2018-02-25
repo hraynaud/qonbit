@@ -2,8 +2,15 @@ module SocialGraph
 
   AQUAINTANCE_DEPTH = 3
 
-  def self.add_user user
-    UserAsNode.create(:user_id => user.id, :name => user.name)
+  def self.add_node_for_user user
+    node = UserAsNode.create(:user_id => user.id, :name => user.name)
+    user.node_id = node.id
+    save
+  end
+
+  def self.remove_node_for_user user
+    node = get_user_node(user)
+    node.destroy
   end
 
   def self.get_user_node user
@@ -42,18 +49,18 @@ module SocialGraph
   end
 
 
-    def find_connected_by_topic(origin_node, topic, depth=5)
-      graph = init_graph origin_node 
-      graph = traverse(graph, depth)
-      keys = graph.keys.uniq.flatten
-      res = []
-      keys.each do |key|
-        node = Related.root.incoming(topic).find(NODE.find(key))
-        res << NODE.find(node.id,:model => lambda {|attributes| attributes['user_id'] ? UserAsNode : Related::Node }) unless node.nil?
-      end
-
-      res
+  def find_connected_by_topic(origin_node, topic, depth=5)
+    graph = init_graph origin_node 
+    graph = traverse(graph, depth)
+    keys = graph.keys.uniq.flatten
+    res = []
+    keys.each do |key|
+      node = Related.root.incoming(topic).find(NODE.find(key))
+      res << NODE.find(node.id,:model => lambda {|attributes| attributes['user_id'] ? UserAsNode : Related::Node }) unless node.nil?
     end
+
+    res
+  end
 
   # Print connections within a certain depth.
   # First bruteforces a topology
@@ -66,7 +73,7 @@ module SocialGraph
       if key == self.id
         next
       end
-     puts "incoming  #{self.incoming(:friend).shortest_path_to(NODE.find(key)).to_a.map(&:name)}"
+      puts "incoming  #{self.incoming(:friend).shortest_path_to(NODE.find(key)).to_a.map(&:name)}"
     end
 
   end
