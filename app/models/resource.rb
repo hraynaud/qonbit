@@ -5,4 +5,10 @@ class Resource < ApplicationRecord
 
   enum status: [ :pending, :confirmed, :rejected, :canceled ]
 
+  validate :user_and_specialist_must_be_different
+
+  def user_and_specialist_must_be_different
+    errors.add(:base, "You cannot add yourself as a resource") if specialist == user
+  end
+
 end
