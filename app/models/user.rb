@@ -29,7 +29,7 @@ class User < ApplicationRecord
   private
 
   def add_to_social_graph
-    SocialGraph.add_node_for_user self
+    SocialGraph.add_to_social_graph self
   end
 
   def remove_from_social_graph

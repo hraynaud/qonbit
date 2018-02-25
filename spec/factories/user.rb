@@ -6,5 +6,9 @@ FactoryBot.define do
         user.user_oauth_tokens.build(token: "12345", secret: "secret", provider: "oauth")
       end
     end
+
+    factory :valid_user do
+      with_auth_tokens
+    end
   end
 end

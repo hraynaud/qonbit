@@ -2,10 +2,10 @@ module SocialGraph
 
   AQUAINTANCE_DEPTH = 3
 
-  def self.add_node_for_user user
+  def self.add_to_social_graph user
     node = UserAsNode.create(:user_id => user.id, :name => user.name)
-    user.node_id = node.id
-    save
+    user.update_column(:node_id, node.id)
+    node
   end
 
   def self.remove_node_for_user user
