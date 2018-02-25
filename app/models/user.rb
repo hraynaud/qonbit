@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_many :projects, dependent: :destroy
   has_many :user_oauth_tokens, dependent: :destroy
   has_one  :direct_auth, dependent: :destroy
+  validates :direct_auth, presence: true, if: :oauth_tokens_missing?
 
   validates_associated :direct_auth, allow_mil: true
 
@@ -33,5 +34,9 @@ class User < ApplicationRecord
 
   def remove_from_social_graph
     SocialGraph.remove_node_for_user self
+  end
+
+  def oauth_tokens_missing?
+    user_oauth_tokens.empty?
   end
 end

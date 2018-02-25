@@ -27,7 +27,6 @@ module SocialGraph
     graph
   end
 
-
   def traverse(graph, depth, origin=nil)
     if depth > 0
       connections = self.friends.to_a
@@ -77,6 +76,4 @@ module SocialGraph
     end
 
   end
-
-
 end
