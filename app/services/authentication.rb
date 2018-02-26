@@ -41,11 +41,7 @@ class Authentication
     end
 
     def register_directly email, pwd
-      user = User.new
-      user.tap do |u|
-        u.build_direct_auth(email: email , password: pwd)
-        u.save
-      end
+      User.create_with_direct_auth(email, pwd)
     end
 
     def login_by_password auth

@@ -2,13 +2,19 @@ class User < ApplicationRecord
   has_many :projects, dependent: :destroy
   has_many :user_oauth_tokens, dependent: :destroy
   has_one  :direct_auth, dependent: :destroy
-  validates :direct_auth, presence: true, if: :oauth_tokens_missing?
 
+  validates :direct_auth, presence: true, if: :oauth_tokens_missing?
   validates_associated :direct_auth, allow_mil: true
 
   after_create :add_to_social_graph
 
   delegate :add_friend, :friends, :befriend, :friends_with?, :follows?, :follow, :unfollow, :followers, :following, :block, :blocks?, to: :as_node
+
+  accepts_nested_attributes_for :direct_auth
+
+  def self.create_with_direct_auth email, pwd
+    create(is_member: true, direct_auth_attributes:{email: email , password: pwd})
+  end
 
   def handle
     user_oauth_tokens.try(:first).handle
