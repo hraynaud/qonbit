@@ -18,10 +18,8 @@ class User < ApplicationRecord
 
   after_create :add_to_social_graph
 
-  attr_accessor :is_member
-
-  def self.create_with_direct_auth email, pwd
-    create(is_member: true, direct_auth_attributes:{email: email , password: pwd})
+  def self.create_with_direct_auth email, pwd, is_member=true
+    create(is_member: is_member, direct_auth_attributes:{email: email , password: pwd})
   end
 
   def handle
