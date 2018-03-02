@@ -7,8 +7,8 @@ module SocialGraph
 
     validates_presence_of :user_id
 
-    def destroy_friendship(rel)
-      rel.destroy
+    def add_friend(other)
+      RELATIONSHIP.create(:friend, self, other)
     end
 
     # Overrides the friends method ind Related::Follower
@@ -24,17 +24,22 @@ module SocialGraph
       outgoing(:block).find(other)
     end
 
-    #TODO figure out why these don't work
-    def follower_ids
-      followers.map(&:user_id)
+    def follows?(other)
+      follows?(other)
     end
 
-    def following_ids
-      following.map(&:user_id)
+    def follow(other)
+      follow!(other)
     end
 
-    def friend_ids
-      friends.map(&:user_id)
+    def unfollow(other)
+      unfollow(other)
+    end
+
+    #TODO verify if the relationshp  needs ot be destroyed first
+
+    def block(from, to)
+      Related::Relationship.create(:block, from, to)
     end
 
     def aquaintance?(other)
