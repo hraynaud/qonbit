@@ -4,12 +4,8 @@ module SocialGraph
 
   class UserAsNode < Related::Node
     include Related::Follower
-
+    include Navigator
     validates_presence_of :user_id
-
-    def add_friend(other)
-      RELATIONSHIP.create(:friend, self, other)
-    end
 
     # Overrides the friends method ind Related::Follower
     def friends
@@ -36,18 +32,22 @@ module SocialGraph
       unfollow(other)
     end
 
+    def acolytes
+      inbound
+    end
+
+    def idols
+      outbound
+    end
+
+    def traverse_graph
+    end
+
     #TODO verify if the relationshp  needs ot be destroyed first
 
-    def block(from, to)
-      Related::Relationship.create(:block, from, to)
-    end
-
-    def aquaintance?(other)
-      path = path_to(other).outgoing(:friend).depth(3)
-      path.to_a.count.between?(1, ::AQUAINTANCE_DEPTH + 1) #array returns the destination path as part of result to add +1 depth
-    end
-
     private
+
+    
 
     def inbound
       incoming(:friend)

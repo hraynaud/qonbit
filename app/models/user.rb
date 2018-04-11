@@ -8,7 +8,7 @@ class User < ApplicationRecord
   validates_associated :direct_auth, allow_mil: true
 
 
-  delegate :add_friend, :friends, :friends_with?, :follows?, :follow, :unfollow, :followers, :following, :block, :blocks?, to: :relationship_mgr
+  delegate :friends, :friends_with?, :follows?, :follow, :unfollow, :followers, :following, :block, :blocks?, to: :relationship_mgr
   delegate :first_name, :last_name, :name, to: :profile
 
   accepts_nested_attributes_for :direct_auth
@@ -35,7 +35,7 @@ class User < ApplicationRecord
   end
 
   def as_node
-    @node ||= SocialGraph.get_user_node self
+    @node ||= SocialGraph::Membership.get_user_node self
   end
 
   private
@@ -45,11 +45,11 @@ class User < ApplicationRecord
   end
 
   def add_to_social_graph
-    SocialGraph.add_to_social_graph self
+    SocialGraph::Membership.add_to_social_graph self
   end
 
   def remove_from_social_graph
-    SocialGraph.remove_node_for_user self
+    SocialGraph::Membership.remove_node_for_user self
   end
 
   def oauth_tokens_missing?

@@ -11,4 +11,19 @@ class Resource < ApplicationRecord
     errors.add(:base, "You cannot add yourself as a resource") if specialist == user
   end
 
+
+  def resource_accepted
+    #This will eventually be wrapped in a resque worker
+    return if resource.is_pending?
+
+    if resource.is_accepted?
+      ImpressionEvent.create(:eventable=>resource)
+      RelationshipManager.register_skill_with_root_node(resource)
+      RelationshipManager.create_friendship_if_none_exists(resource)
+      RelationshipManager.establish_following_relationship(resource)
+    end
+
+      #ScoreKeeper.update_scores(impression)
+  end
+
 end
